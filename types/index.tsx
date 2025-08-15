@@ -9,7 +9,7 @@ export interface Invoice {
   id: string;
   invoiceNumber: string;
   clientName: string;
-  clientEmail?: string;
+  clientPhone?: string;
   clientAddress?: string;
   date: string;
   dueDate?: string;
@@ -21,5 +21,6 @@ export interface Invoice {
   paidAmount: number;
   status: 'pending' | 'paid' | 'partial' | 'overdue';
   notes?: string;
+  vehicleNo?: string;
   createdAt: string;
 }

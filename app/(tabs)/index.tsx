@@ -1,14 +1,14 @@
 import { FileText, Search, Share, Trash2 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    RefreshControl,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Invoice } from '../../types';
@@ -93,7 +93,7 @@ export default function InvoicesScreen() {
           <Text style={styles.date}>{item.date}</Text>
         </View>
         <View style={styles.invoiceAmount}>
-          <Text style={styles.totalAmount}>${item.total.toFixed(2)}</Text>
+          <Text style={styles.totalAmount}>₹{item.total.toFixed(2)}</Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
             <Text style={styles.statusText}>{item.status.toUpperCase()}</Text>
           </View>
@@ -103,7 +103,7 @@ export default function InvoicesScreen() {
       {item.status !== 'paid' && (
         <View style={styles.pendingInfo}>
           <Text style={styles.pendingText}>
-            Pending: ${(item.total - item.paidAmount).toFixed(2)}
+            Pending: ₹{(item.total - item.paidAmount).toFixed(2)}
           </Text>
         </View>
       )}

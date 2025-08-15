@@ -1,10 +1,29 @@
-import { FileText, Info, Mail, MapPin, Phone, Trash2, User } from 'lucide-react-native';
-import React from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CompanyInfo } from '@/types/settings';
+import { FileText, Info, Trash2 } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { invoiceStorage } from '../../utils/storage';
+import { companyStorage, invoiceStorage } from '../../utils/storage';
 
 export default function SettingsScreen() {
+const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+  });
+
+  useEffect(() => {
+    companyStorage.getInfo().then(info => {
+      if (info) setCompanyInfo(info);
+    });
+  }, []);
+
+  const handleSave = async () => {
+    await companyStorage.setInfo(companyInfo);
+    Alert.alert('Saved', 'Company info updated!');
+  };
+
   const handleClearAllData = () => {
     Alert.alert(
       'Clear All Data',
@@ -45,54 +64,35 @@ export default function SettingsScreen() {
       <View style={styles.content}>
         {/* Company Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Company Information</Text>
-          <Text style={styles.sectionDescription}>
-            Set up your company details for invoices
-          </Text>
-          
-          <View style={styles.settingCard}>
-            <View style={styles.settingItem}>
-              <View style={styles.settingIcon}>
-                <User size={20} color="#3b82f6" />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingTitle}>Company Name</Text>
-                <Text style={styles.settingValue}>Not set</Text>
-              </View>
-            </View>
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingIcon}>
-                <Mail size={20} color="#3b82f6" />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingTitle}>Email</Text>
-                <Text style={styles.settingValue}>Not set</Text>
-              </View>
-            </View>
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingIcon}>
-                <Phone size={20} color="#3b82f6" />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingTitle}>Phone</Text>
-                <Text style={styles.settingValue}>Not set</Text>
-              </View>
-            </View>
-
-            <View style={[styles.settingItem, styles.lastItem]}>
-              <View style={styles.settingIcon}>
-                <MapPin size={20} color="#3b82f6" />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={styles.settingTitle}>Address</Text>
-                <Text style={styles.settingValue}>Not set</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
+        <Text style={styles.sectionTitle}>Edit Company Information</Text>
+        <TextInput
+          placeholder="Company Name"
+          style={styles.input}
+          value={companyInfo.name}
+          onChangeText={name => setCompanyInfo({ ...companyInfo, name })}
+        />
+        <TextInput
+          placeholder="Phone"
+          style={styles.input}
+          value={companyInfo.phone}
+          onChangeText={phone => setCompanyInfo({ ...companyInfo, phone })}
+        />
+        <TextInput
+          placeholder="Email"
+          style={styles.input}
+          value={companyInfo.email}
+          onChangeText={email => setCompanyInfo({ ...companyInfo, email })}
+        />
+        <TextInput
+          placeholder="Address"
+          style={styles.input}
+          value={companyInfo.address}
+          onChangeText={address => setCompanyInfo({ ...companyInfo, address })}
+        />
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>Save Company Info</Text>
+        </TouchableOpacity>
+      </View>
         {/* Invoice Settings */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Invoice Settings</Text>
@@ -237,5 +237,32 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#ef4444',
     marginLeft: 12,
+  },
+  input: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#111827',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    marginBottom: 16,
+  },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#10b981', // Emerald green
+    marginHorizontal: 24,
+    marginBottom: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  saveButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });

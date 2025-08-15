@@ -19,7 +19,7 @@ export default function CreateInvoiceScreen() {
   const uuidv4 = uuid.v4;   
   const [invoiceNumber, setInvoiceNumber] = useState(`INV-${Date.now()}`);
   const [clientName, setClientName] = useState('');
-  const [clientEmail, setClientEmail] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
   const [clientAddress, setClientAddress] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState('');
@@ -84,7 +84,7 @@ export default function CreateInvoiceScreen() {
       id: uuidv4().toString(),
       invoiceNumber,
       clientName,
-      clientEmail,
+      clientPhone,
       clientAddress,
       date,
       dueDate,
@@ -115,7 +115,7 @@ export default function CreateInvoiceScreen() {
               // Reset form
               setInvoiceNumber(`INV-${Date.now()}`);
               setClientName('');
-              setClientEmail('');
+              setClientPhone('');
               setClientAddress('');
               setDate(new Date().toISOString().split('T')[0]);
               setDueDate('');
@@ -139,7 +139,6 @@ export default function CreateInvoiceScreen() {
           <Text style={styles.subtitle}>Fill in the details below</Text>
         </View>
 
-        {/* Client Information */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Client Information</Text>
           
@@ -164,13 +163,13 @@ export default function CreateInvoiceScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Client Email</Text>
+            <Text style={styles.label}>Client Phone</Text>
             <TextInput
               style={styles.input}
-              value={clientEmail}
-              onChangeText={setClientEmail}
-              placeholder="client@example.com"
-              keyboardType="email-address"
+              value={clientPhone}
+              onChangeText={setClientPhone}
+              placeholder="+919234567890"
+              keyboardType="phone-pad"
             />
           </View>
 
@@ -264,7 +263,7 @@ export default function CreateInvoiceScreen() {
 
               <View style={styles.itemTotal}>
                 <Text style={styles.itemTotalText}>
-                  Total: ${(item.quantity * item.price).toFixed(2)}
+                  Total: ₹{(item.quantity * item.price).toFixed(2)}
                 </Text>
               </View>
             </View>
@@ -301,24 +300,24 @@ export default function CreateInvoiceScreen() {
           <View style={styles.calculationCard}>
             <View style={styles.calculationRow}>
               <Text style={styles.calculationLabel}>Subtotal:</Text>
-              <Text style={styles.calculationValue}>${calculateSubtotal().toFixed(2)}</Text>
+              <Text style={styles.calculationValue}>₹{calculateSubtotal().toFixed(2)}</Text>
             </View>
             <View style={styles.calculationRow}>
               <Text style={styles.calculationLabel}>Tax ({taxRate}%):</Text>
-              <Text style={styles.calculationValue}>${calculateTax().toFixed(2)}</Text>
+              <Text style={styles.calculationValue}>₹{calculateTax().toFixed(2)}</Text>
             </View>
             <View style={[styles.calculationRow, styles.totalRow]}>
               <Text style={styles.totalLabel}>Total:</Text>
-              <Text style={styles.totalValue}>${calculateTotal().toFixed(2)}</Text>
+              <Text style={styles.totalValue}>₹{calculateTotal().toFixed(2)}</Text>
             </View>
             <View style={styles.calculationRow}>
               <Text style={styles.calculationLabel}>Paid:</Text>
-              <Text style={styles.calculationValue}>${paidAmount.toFixed(2)}</Text>
+              <Text style={styles.calculationValue}>₹{paidAmount.toFixed(2)}</Text>
             </View>
             <View style={styles.calculationRow}>
               <Text style={styles.calculationLabel}>Pending:</Text>
               <Text style={[styles.calculationValue, { color: calculatePending() > 0 ? '#ef4444' : '#10b981' }]}>
-                ${calculatePending().toFixed(2)}
+                ₹{calculatePending().toFixed(2)}
               </Text>
             </View>
           </View>
@@ -371,7 +370,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 32,
-    paddingHorizontal: 24,
+    paddingHorizontal: 24
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -411,6 +410,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
+    
   },
   halfWidth: {
     flex: 1,
@@ -466,6 +466,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    marginTop: 16
   },
   calculationRow: {
     flexDirection: 'row',

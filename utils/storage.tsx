@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Invoice } from '../types';
+import type { CompanyInfo } from '../types/settings';
 
 const INVOICES_KEY = '@invoices';
+const COMPANY_INFO_KEY = '@company_info';
 
 export const invoiceStorage = {
   async saveInvoice(invoice: Invoice): Promise<void> {
@@ -35,7 +37,7 @@ export const invoiceStorage = {
   async updateInvoice(updatedInvoice: Invoice): Promise<void> {
     try {
       const invoices = await this.getAllInvoices();
-      const updatedInvoices = invoices.map(invoice => 
+      const updatedInvoices = invoices.map(invoice =>
         invoice.id === updatedInvoice.id ? updatedInvoice : invoice
       );
       await AsyncStorage.setItem(INVOICES_KEY, JSON.stringify(updatedInvoices));
@@ -59,6 +61,33 @@ export const invoiceStorage = {
       await AsyncStorage.removeItem(INVOICES_KEY);
     } catch (error) {
       throw new Error('Failed to clear invoices');
+    }
+  },
+};
+
+export const companyStorage = {
+  async getInfo(): Promise<CompanyInfo | null> {
+    try {
+      const data = await AsyncStorage.getItem(COMPANY_INFO_KEY);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      return null;
+    }
+  },
+
+  async setInfo(info: CompanyInfo): Promise<void> {
+    try {
+      await AsyncStorage.setItem(COMPANY_INFO_KEY, JSON.stringify(info));
+    } catch (error) {
+      throw new Error('Failed to save company info');
+    }
+  },
+
+  async clearInfo(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(COMPANY_INFO_KEY);
+    } catch (error) {
+      throw new Error('Failed to clear company info');
     }
   },
 };
