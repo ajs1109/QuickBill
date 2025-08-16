@@ -3,31 +3,38 @@ import * as FileSystem from 'expo-file-system';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import type { Invoice } from '../types';
+import type { CompanyInfo } from '../types/settings';
 
-export const generateInvoicePDF = async (invoice: Invoice) => {
-
+export const generateInvoicePDF = async (
+  invoice: Invoice,
+  companyInfo: CompanyInfo
+) => {
+  // Load company logo asset
   const imageAsset = Asset.fromModule(require('../assets/images/logos/GSE.png'));
   await imageAsset.downloadAsync();
   const base64Logo = await FileSystem.readAsStringAsync(imageAsset.localUri!, {
     encoding: FileSystem.EncodingType.Base64,
   });
 
-  const htmlContent = generateInvoiceHTML(invoice, base64Logo);
+  // Generate HTML with dynamic invoice and company info
+  const htmlContent = generateInvoiceHTML(invoice, companyInfo, base64Logo);
 
+  // Generate PDF
   const { uri } = await Print.printToFileAsync({
     html: htmlContent,
     base64: false,
   });
 
-  // Create a more meaningful filename
+  // More meaningful filename
   const fileName = `invoice_${invoice.invoiceNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${invoice.clientName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
   const newUri = `${FileSystem.documentDirectory}${fileName}`;
-  
+
   await FileSystem.moveAsync({
     from: uri,
     to: newUri,
   });
 
+  // Share PDF if available
   if (await Sharing.isAvailableAsync()) {
     await Sharing.shareAsync(newUri);
   }
@@ -35,15 +42,19 @@ export const generateInvoicePDF = async (invoice: Invoice) => {
   return newUri;
 };
 
-const generateInvoiceHTML = (invoice: Invoice, base64Logo?: string): string => {
+const generateInvoiceHTML = (
+  invoice: Invoice,
+  companyInfo: CompanyInfo,
+  base64Logo?: string
+): string => {
   const itemsHTML = invoice.items
     .map(
       (item) => `
         <tr>
           <td class="td br">${item.name}</td>
           <td class="td br">${item.quantity} ${item.quantity > 1 ? 'Brass' : 'Brass'}</td>
-          <td class="td br">${item.price.toFixed(0)}</td>
-          <td class="td">${(item.quantity * item.price).toFixed(0)}/-</td>
+          <td class="td br">${item.price.toFixed(2)}</td>
+          <td class="td">${(item.quantity * item.price).toFixed(2)}/-</td>
         </tr>
       `
     )
@@ -91,7 +102,6 @@ const generateInvoiceHTML = (invoice: Invoice, base64Logo?: string): string => {
       display: flex;
       flex-direction: row;
       align-items: flex-end;
-
     }
     .company-info{
       display: flex;
@@ -123,6 +133,13 @@ const generateInvoiceHTML = (invoice: Invoice, base64Logo?: string): string => {
       font-weight: normal;
       color: #444;
       margin-top: 2px;
+    }
+    .company-address {
+      font-size: 13px;
+      font-weight: normal;
+      color: #444;
+      margin-top: 2px;
+      text-align: right;
     }
     hr {
       border: none;
@@ -298,11 +315,15 @@ const generateInvoiceHTML = (invoice: Invoice, base64Logo?: string): string => {
     <div class="header">
       <div class="company-right">
         <div class="company-info">
-          <div class="company-name">GANGAWANE SUPPLIERS &<br>EARTHMOVERS</div>
-          <div class="company-contact">9579994488 | 7066564488</div>
+          <div class="company-name">${companyInfo.name || "Company Name"}</div>
+          <div class="company-contact">
+            ${companyInfo.phone || ""}
+            ${companyInfo.email ? " | " + companyInfo.email : ""}
+          </div>
+          ${companyInfo.address ? `<div class="company-address">${companyInfo.address}</div>` : ""}
         </div>
-        <img 
-          src="data:image/png;base64,${base64Logo || ''}" 
+        <img
+          src="data:image/png;base64,${base64Logo || ''}"
           alt="Company Logo"
           class="logo-img"
         />
@@ -352,18 +373,18 @@ const generateInvoiceHTML = (invoice: Invoice, base64Logo?: string): string => {
           </div>
           <div class="totals-row">
             <span>Paid :</span>
-            <span>${invoice.paidAmount > 0 ? `₹${invoice.paidAmount.toFixed(0)}/-` : 'On Delivery'}</span>
+            <span>${invoice.paidAmount > 0 ? `₹${invoice.paidAmount.toFixed(2)}/-` : 'On Delivery'}</span>
           </div>
           ${(invoice.total - invoice.paidAmount) > 0
             ? `<div class="totals-row">
                 <span>Pending :</span>
-                <span>₹${(invoice.total - invoice.paidAmount).toFixed(0)}/-</span>
+                <span>₹${(invoice.total - invoice.paidAmount).toFixed(2)}/-</span>
                </div>`
             : ''
           }
           <div class="final-total">
             <span>Total :</span>
-            <span>₹${invoice.total.toFixed(0)}/-</span>
+            <span>₹${invoice.total.toFixed(2)}/-</span>
           </div>
         </div>
       </div>
