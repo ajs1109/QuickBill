@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Expo App",
+      "type": "reactnative",
+      "request": "launch",
+      "platform": "exponent",
+      "sourceMaps": true,
+      "cwd": "${workspaceFolder}",
+      "enableDebug": true
+    }
+  ]
+}

@@ -59,6 +59,9 @@ const generateInvoiceHTML = (
       `
     )
     .join('');
+    
+    const paidAmountIsNaN = isNaN(Number(invoice.paidAmount));
+    const pendingAmount = paidAmountIsNaN ? invoice.total : invoice.total - parseFloat(invoice.paidAmount);
 
   return `
 <!DOCTYPE html>
@@ -107,6 +110,7 @@ const generateInvoiceHTML = (
       display: flex;
       flex-direction: column;
       align-items: flex-end;
+      width: 300px;
     }
     .logo-img {
       width: 68px;
@@ -373,15 +377,12 @@ const generateInvoiceHTML = (
           </div>
           <div class="totals-row">
             <span>Paid :</span>
-            <span>${invoice.paidAmount > 0 ? `₹${invoice.paidAmount.toFixed(2)}/-` : 'On Delivery'}</span>
+            <span>${!isNaN(Number(invoice.paidAmount)) ? `₹${Number(invoice.paidAmount)}/-` : invoice.paidAmount}</span>
           </div>
-          ${(invoice.total - invoice.paidAmount) > 0
-            ? `<div class="totals-row">
-                <span>Pending :</span>
-                <span>₹${(invoice.total - invoice.paidAmount).toFixed(2)}/-</span>
-               </div>`
-            : ''
-          }
+          <div class="totals-row">
+              <span>Pending :</span>
+              <span>₹${pendingAmount.toFixed(2)}/-</span>
+              </div>
           <div class="final-total">
             <span>Total :</span>
             <span>₹${invoice.total.toFixed(2)}/-</span>

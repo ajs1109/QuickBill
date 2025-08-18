@@ -16,7 +16,9 @@
         "foregroundImage": "./assets/images/logos/GSE.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.ajs1109.QuickBill",
+      "minSdkVersion": 21
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +39,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "940a1a33-4224-494f-822f-4a17086cdce0"
+      }
     }
   }
 }

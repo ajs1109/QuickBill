@@ -16,7 +16,7 @@ import type { Invoice, InvoiceItem } from '../../types';
 import { invoiceStorage } from '../../utils/storage';
 
 export default function CreateInvoiceScreen() {
-  const uuidv4 = uuid.v4;   
+  const uuidv4 = uuid.v4;
   const [invoiceNumber, setInvoiceNumber] = useState(`INV-${Date.now()}`);
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
@@ -27,8 +27,9 @@ export default function CreateInvoiceScreen() {
     { id: uuidv4().toString(), name: '', quantity: 1, price: 0 }
   ]);
   const [taxRate, setTaxRate] = useState(10);
-  const [paidAmount, setPaidAmount] = useState(0);
+  const [paidAmountStr, setPaidAmountStr] = useState('');
   const [notes, setNotes] = useState('');
+  const paidAmount = Number(paidAmountStr) || 0;
 
   const addItem = () => {
     setItems([...items, { id: uuidv4().toString(), name: '', quantity: 1, price: 0 }]);
@@ -39,33 +40,17 @@ export default function CreateInvoiceScreen() {
   };
 
   const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
-    setItems(items.map(item => 
+    setItems(items.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     ));
   };
 
-  const calculateSubtotal = () => {
-    return items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-  };
-
-  const calculateTax = () => {
-    return (calculateSubtotal() * taxRate) / 100;
-  };
-
-  const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax();
-  };
-
-  const calculatePending = () => {
-    return Math.max(0, calculateTotal() - paidAmount);
-  };
-
-  const getPaymentStatus = () => {
-    const total = calculateTotal();
-    if (paidAmount >= total) return 'paid';
-    if (paidAmount > 0) return 'partial';
-    return 'pending';
-  };
+  const subTotalAmount = items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+  const taxAmount = (subTotalAmount * taxRate) / 100;
+  const totalAmount = subTotalAmount + taxAmount;
+  const pendingAmount = Math.max(0, totalAmount - paidAmount);
+  const status = paidAmount >= totalAmount ? 'paid' : (paidAmount > 0 ? 'partial' : 'pending');
+  const validItems = items.filter(item => item.name.trim());
 
   const handleSaveInvoice = async () => {
     if (!clientName.trim()) {
@@ -78,8 +63,6 @@ export default function CreateInvoiceScreen() {
       return;
     }
 
-    const validItems = items.filter(item => item.name.trim());
-    
     const invoice: Invoice = {
       id: uuidv4().toString(),
       invoiceNumber,
@@ -89,12 +72,12 @@ export default function CreateInvoiceScreen() {
       date,
       dueDate,
       items: validItems,
-      subtotal: calculateSubtotal(),
+      subtotal: subTotalAmount,
       taxRate,
-      taxAmount: calculateTax(),
-      total: calculateTotal(),
-      paidAmount,
-      status: getPaymentStatus(),
+      taxAmount,
+      total: totalAmount,
+      paidAmount: paidAmountStr,
+      status,
       notes,
       createdAt: new Date().toISOString(),
     };
@@ -120,7 +103,7 @@ export default function CreateInvoiceScreen() {
               setDate(new Date().toISOString().split('T')[0]);
               setDueDate('');
               setItems([{ id: uuidv4().toString(), name: '', quantity: 1, price: 0 }]);
-              setPaidAmount(0);
+              setPaidAmountStr('');
               setNotes('');
             },
           },
@@ -141,7 +124,7 @@ export default function CreateInvoiceScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Client Information</Text>
-          
+
           <View style={styles.formGroup}>
             <Text style={styles.label}>Invoice Number</Text>
             <TextInput
@@ -273,7 +256,7 @@ export default function CreateInvoiceScreen() {
         {/* Calculations */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment & Tax</Text>
-          
+
           <View style={styles.row}>
             <View style={styles.halfWidth}>
               <Text style={styles.label}>Tax Rate (%)</Text>
@@ -289,10 +272,10 @@ export default function CreateInvoiceScreen() {
               <Text style={styles.label}>Paid Amount</Text>
               <TextInput
                 style={styles.input}
-                value={paidAmount.toString()}
-                onChangeText={(value) => setPaidAmount(parseFloat(value) || 0)}
-                keyboardType="numeric"
-                placeholder="0.00"
+                value={paidAmountStr}
+                onChangeText={setPaidAmountStr}
+                keyboardType="name-phone-pad"
+                placeholder="Paid Amount"
               />
             </View>
           </View>
@@ -300,24 +283,24 @@ export default function CreateInvoiceScreen() {
           <View style={styles.calculationCard}>
             <View style={styles.calculationRow}>
               <Text style={styles.calculationLabel}>Subtotal:</Text>
-              <Text style={styles.calculationValue}>₹{calculateSubtotal().toFixed(2)}</Text>
+              <Text style={styles.calculationValue}>₹{subTotalAmount.toFixed(2)}</Text>
             </View>
             <View style={styles.calculationRow}>
               <Text style={styles.calculationLabel}>Tax ({taxRate}%):</Text>
-              <Text style={styles.calculationValue}>₹{calculateTax().toFixed(2)}</Text>
+              <Text style={styles.calculationValue}>₹{taxAmount.toFixed(2)}</Text>
             </View>
             <View style={[styles.calculationRow, styles.totalRow]}>
               <Text style={styles.totalLabel}>Total:</Text>
-              <Text style={styles.totalValue}>₹{calculateTotal().toFixed(2)}</Text>
+              <Text style={styles.totalValue}>₹{totalAmount.toFixed(2)}</Text>
             </View>
             <View style={styles.calculationRow}>
               <Text style={styles.calculationLabel}>Paid:</Text>
-              <Text style={styles.calculationValue}>₹{paidAmount.toFixed(2)}</Text>
+              <Text style={styles.calculationValue}>{isNaN(Number(paidAmountStr)) ? paidAmountStr : `₹${paidAmount.toFixed(2)}`}</Text>
             </View>
             <View style={styles.calculationRow}>
               <Text style={styles.calculationLabel}>Pending:</Text>
-              <Text style={[styles.calculationValue, { color: calculatePending() > 0 ? '#ef4444' : '#10b981' }]}>
-                ₹{calculatePending().toFixed(2)}
+              <Text style={[styles.calculationValue, { color: pendingAmount > 0 ? '#ef4444' : '#10b981' }]}>
+                ₹{pendingAmount.toFixed(2)}
               </Text>
             </View>
           </View>
@@ -410,7 +393,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
-    
+
   },
   halfWidth: {
     flex: 1,

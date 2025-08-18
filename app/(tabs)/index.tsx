@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Invoice } from '../../types';
 import { generateInvoicePDF } from '../../utils/pdfGenerator';
-import { invoiceStorage } from '../../utils/storage';
+import { companyStorage, invoiceStorage } from '../../utils/storage';
 
 export default function InvoicesScreen() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -59,7 +59,12 @@ export default function InvoicesScreen() {
 
   const handleGeneratePDF = async (invoice: Invoice) => {
     try {
-      await generateInvoicePDF(invoice);
+      const companyInfo = await companyStorage.getInfo();
+      if (!companyInfo) {
+        Alert.alert('Error', 'Company information not found');
+        return;
+      }
+      await generateInvoicePDF(invoice, companyInfo);
     } catch (error) {
       Alert.alert('Error', 'Failed to generate PDF');
     }

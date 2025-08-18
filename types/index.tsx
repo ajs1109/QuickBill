@@ -18,7 +18,7 @@ export interface Invoice {
   taxRate: number;
   taxAmount: number;
   total: number;
-  paidAmount: number;
+  paidAmount: string;
   status: 'pending' | 'paid' | 'partial' | 'overdue';
   notes?: string;
   vehicleNo?: string;

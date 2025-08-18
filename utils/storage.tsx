@@ -19,7 +19,9 @@ export const invoiceStorage = {
   async getAllInvoices(): Promise<Invoice[]> {
     try {
       const invoicesJson = await AsyncStorage.getItem(INVOICES_KEY);
-      return invoicesJson ? JSON.parse(invoicesJson) : [];
+      let invoices: Invoice[] = invoicesJson ? JSON.parse(invoicesJson) : [];
+      invoices = invoices.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      return invoices;
     } catch (error) {
       return [];
     }
