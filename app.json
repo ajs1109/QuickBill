@@ -17,8 +17,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.ajs1109.QuickBill",
-      "minSdkVersion": 21
+      "package": "com.ajs1109.QuickBill"
     },
     "web": {
       "bundler": "metro",
