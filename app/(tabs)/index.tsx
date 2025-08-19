@@ -108,7 +108,7 @@ export default function InvoicesScreen() {
       {item.status !== 'paid' && (
         <View style={styles.pendingInfo}>
           <Text style={styles.pendingText}>
-            Pending: ₹{(item.total - item.paidAmount).toFixed(2)}
+            Pending: ₹{(item.total - (parseFloat(item.paidAmount) || 0)).toFixed(2)}
           </Text>
         </View>
       )}
