@@ -90,7 +90,7 @@ export default function CreateInvoiceScreen() {
         [
           {
             text: 'View Invoices',
-            onPress: () => router.push('/(tabs)'),
+            onPress: () => router.replace('/(tabs)'),
           },
           {
             text: 'Create Another',
