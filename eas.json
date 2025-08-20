@@ -25,6 +25,7 @@
       }
     },
     "production": {
+      "distribution": "internal", 
       "autoIncrement": true,
       "android": {
         "buildType": "apk"
@@ -37,6 +38,20 @@
       "extends": "production",
       "android": {
         "buildType": "apk"
+      }
+    },
+    "production-debug": {
+      "distribution": "internal",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "ios": {
+        "buildConfiguration": "Debug" 
+      },
+      "env": {
+        "NODE_ENV": "production"
       }
     }
   },
