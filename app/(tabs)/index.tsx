@@ -66,7 +66,7 @@ export default function InvoicesScreen() {
       }
       await generateInvoicePDF(invoice, companyInfo);
     } catch (error) {
-      Alert.alert('Error', 'Failed to generate PDF');
+      Alert.alert('Error', error);
     }
   };
 
