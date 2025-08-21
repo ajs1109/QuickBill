@@ -27,6 +27,16 @@
         <data android:scheme="quickbill"/>
         <data android:scheme="exp+quickbill"/>
       </intent-filter>
+      <intent-filter data-generated="true">
+        <action android:name="android.intent.action.android.intent.action.SEND"/>
+        <data android:mimeType="text/plain"/>
+        <category android:name="android.intent.category.android.intent.category.DEFAULT"/>
+      </intent-filter>
+      <intent-filter data-generated="true">
+        <action android:name="android.intent.action.android.intent.action.SEND"/>
+        <data android:mimeType="image/*"/>
+        <category android:name="android.intent.category.android.intent.category.DEFAULT"/>
+      </intent-filter>
     </activity>
   </application>
 </manifest>

@@ -16,6 +16,22 @@
         "foregroundImage": "./assets/images/logos/GSE.png",
         "backgroundColor": "#ffffff"
       },
+      "intentFilters": [
+        {
+          "action": "android.intent.action.SEND",
+          "category": ["android.intent.category.DEFAULT"],
+          "data": {
+            "mimeType": "text/plain"
+          }
+        },
+        {
+          "action": "android.intent.action.SEND",
+          "category": ["android.intent.category.DEFAULT"],
+          "data": {
+            "mimeType": "image/*"
+          }
+        }
+      ],
       "edgeToEdgeEnabled": true,
       "package": "com.ajs1109.QuickBill"
     },
