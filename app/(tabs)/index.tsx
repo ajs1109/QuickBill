@@ -1,5 +1,6 @@
+import { useFocusEffect } from 'expo-router';
 import { FileText, Search, Share, Trash2 } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -20,10 +21,11 @@ export default function InvoicesScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadInvoices();
-  }, []);
-
+  useFocusEffect(
+    useCallback(() => {
+      loadInvoices();
+    }, [])
+  );
   const loadInvoices = async () => {
     try {
       const loadedInvoices = await invoiceStorage.getAllInvoices();
