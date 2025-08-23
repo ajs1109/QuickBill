@@ -1,3 +1,4 @@
+import { CustomTextInput } from '@/components/custom/customTextInput';
 import { router } from 'expo-router';
 import { Plus, Save, Trash2 } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -6,7 +7,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -23,6 +23,7 @@ export default function CreateInvoiceScreen() {
   const [clientAddress, setClientAddress] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState('');
+  const [vehicleNo, setVehicleNo] = useState('');
   const [items, setItems] = useState<InvoiceItem[]>([
     { id: uuidv4().toString(), name: '', quantity: 1, price: 0 }
   ]);
@@ -30,6 +31,20 @@ export default function CreateInvoiceScreen() {
   const [paidAmountStr, setPaidAmountStr] = useState('');
   const [notes, setNotes] = useState('');
   const paidAmount = Number(paidAmountStr) || 0;
+
+  const resetForm = () => {
+    setInvoiceNumber(`INV-${Date.now()}`);
+    setClientName('');
+    setClientPhone('');
+    setClientAddress('');
+    setDate(new Date().toISOString().split('T')[0]);
+    setDueDate('');
+    setVehicleNo('');
+    setItems([{ id: uuidv4().toString(), name: '', quantity: 1, price: 0 }]);
+    setTaxRate(10);
+    setPaidAmountStr('');
+    setNotes('');
+  };
 
   const addItem = () => {
     setItems([...items, { id: uuidv4().toString(), name: '', quantity: 1, price: 0 }]);
@@ -71,6 +86,7 @@ export default function CreateInvoiceScreen() {
       clientAddress,
       date,
       dueDate,
+      vehicleNo,
       items: validItems,
       subtotal: subTotalAmount,
       taxRate,
@@ -94,21 +110,11 @@ export default function CreateInvoiceScreen() {
           },
           {
             text: 'Create Another',
-            onPress: () => {
-              // Reset form
-              setInvoiceNumber(`INV-${Date.now()}`);
-              setClientName('');
-              setClientPhone('');
-              setClientAddress('');
-              setDate(new Date().toISOString().split('T')[0]);
-              setDueDate('');
-              setItems([{ id: uuidv4().toString(), name: '', quantity: 1, price: 0 }]);
-              setPaidAmountStr('');
-              setNotes('');
-            },
+            onPress: resetForm,
           },
         ]
       );
+      resetForm();
     } catch (error) {
       Alert.alert('Error', 'Failed to save invoice');
     }
@@ -122,56 +128,59 @@ export default function CreateInvoiceScreen() {
           <Text style={styles.subtitle}>Fill in the details below</Text>
         </View>
 
+        {/* Client Info */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Client Information</Text>
 
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Invoice Number</Text>
-            <TextInput
-              style={styles.input}
-              value={invoiceNumber}
-              onChangeText={setInvoiceNumber}
-              placeholder="INV-001"
-            />
-          </View>
+          {/* Invoice Number */}
+          <Text style={styles.label}>Invoice Number</Text>
+          <CustomTextInput
+            style={styles.input}
+            value={invoiceNumber}
+            onChangeText={setInvoiceNumber}
+            placeholder="INV-001"
+          />
 
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Client Name *</Text>
-            <TextInput
-              style={styles.input}
-              value={clientName}
-              onChangeText={setClientName}
-              placeholder="Enter client name"
-            />
-          </View>
+          <Text style={styles.label}>Client Name *</Text>
+          <CustomTextInput
+            style={styles.input}
+            value={clientName}
+            onChangeText={setClientName}
+            placeholder="Enter client name"
+          />
 
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Client Phone</Text>
-            <TextInput
-              style={styles.input}
-              value={clientPhone}
-              onChangeText={setClientPhone}
-              placeholder="+919234567890"
-              keyboardType="phone-pad"
-            />
-          </View>
+          <Text style={styles.label}>Client Phone</Text>
+          <CustomTextInput
+            style={styles.input}
+            value={clientPhone}
+            onChangeText={setClientPhone}
+            placeholder="+919234567890"
+            keyboardType="phone-pad"
+          />
 
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Client Address</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={clientAddress}
-              onChangeText={setClientAddress}
-              placeholder="Enter client address"
-              multiline
-              numberOfLines={3}
-            />
-          </View>
+          <Text style={styles.label}>Client Address</Text>
+          <CustomTextInput
+            style={[styles.input, styles.textArea]}
+            value={clientAddress}
+            onChangeText={setClientAddress}
+            placeholder="Enter client address"
+            multiline
+            numberOfLines={3}
+          />
+
+          {/* Vehicle No */}
+          <Text style={styles.label}>Vehicle Number</Text>
+          <CustomTextInput
+            style={styles.input}
+            value={vehicleNo}
+            onChangeText={setVehicleNo}
+            placeholder="e.g. MH12AB1234"
+          />
 
           <View style={styles.row}>
             <View style={styles.halfWidth}>
               <Text style={styles.label}>Date</Text>
-              <TextInput
+              <CustomTextInput
                 style={styles.input}
                 value={date}
                 onChangeText={setDate}
@@ -180,7 +189,7 @@ export default function CreateInvoiceScreen() {
             </View>
             <View style={styles.halfWidth}>
               <Text style={styles.label}>Due Date</Text>
-              <TextInput
+              <CustomTextInput
                 style={styles.input}
                 value={dueDate}
                 onChangeText={setDueDate}
@@ -214,7 +223,7 @@ export default function CreateInvoiceScreen() {
                 )}
               </View>
 
-              <TextInput
+              <CustomTextInput
                 style={styles.input}
                 value={item.name}
                 onChangeText={(value) => updateItem(item.id, 'name', value)}
@@ -224,7 +233,7 @@ export default function CreateInvoiceScreen() {
               <View style={styles.row}>
                 <View style={styles.halfWidth}>
                   <Text style={styles.label}>Quantity</Text>
-                  <TextInput
+                  <CustomTextInput
                     style={styles.input}
                     value={item.quantity.toString()}
                     onChangeText={(value) => updateItem(item.id, 'quantity', parseInt(value) || 0)}
@@ -234,7 +243,7 @@ export default function CreateInvoiceScreen() {
                 </View>
                 <View style={styles.halfWidth}>
                   <Text style={styles.label}>Price</Text>
-                  <TextInput
+                  <CustomTextInput
                     style={styles.input}
                     value={item.price.toString()}
                     onChangeText={(value) => updateItem(item.id, 'price', parseFloat(value) || 0)}
@@ -260,7 +269,7 @@ export default function CreateInvoiceScreen() {
           <View style={styles.row}>
             <View style={styles.halfWidth}>
               <Text style={styles.label}>Tax Rate (%)</Text>
-              <TextInput
+              <CustomTextInput
                 style={styles.input}
                 value={taxRate.toString()}
                 onChangeText={(value) => setTaxRate(parseFloat(value) || 0)}
@@ -270,7 +279,7 @@ export default function CreateInvoiceScreen() {
             </View>
             <View style={styles.halfWidth}>
               <Text style={styles.label}>Paid Amount</Text>
-              <TextInput
+              <CustomTextInput
                 style={styles.input}
                 value={paidAmountStr}
                 onChangeText={setPaidAmountStr}
@@ -309,7 +318,7 @@ export default function CreateInvoiceScreen() {
         {/* Notes */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Notes</Text>
-          <TextInput
+          <CustomTextInput
             style={[styles.input, styles.textArea]}
             value={notes}
             onChangeText={setNotes}
@@ -319,6 +328,7 @@ export default function CreateInvoiceScreen() {
           />
         </View>
 
+        {/* Save */}
         <TouchableOpacity style={styles.saveButton} onPress={handleSaveInvoice}>
           <Save size={20} color="#ffffff" />
           <Text style={styles.saveButtonText}>Save Invoice</Text>

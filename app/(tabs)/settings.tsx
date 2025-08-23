@@ -1,7 +1,8 @@
+import { CustomTextInput } from '@/components/custom/customTextInput';
 import { CompanyInfo } from '@/types/settings';
 import { FileText, Info, Trash2 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { companyStorage, invoiceStorage } from '../../utils/storage';
 
@@ -65,25 +66,29 @@ const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
         {/* Company Information */}
         <View style={styles.section}>
         <Text style={styles.sectionTitle}>Edit Company Information</Text>
-        <TextInput
+        <Text style={styles.label}>Company Name</Text>
+        <CustomTextInput
           placeholder="Company Name"
           style={styles.input}
           value={companyInfo.name}
           onChangeText={name => setCompanyInfo({ ...companyInfo, name })}
         />
-        <TextInput
+        <Text style={styles.label}>Phone</Text>
+        <CustomTextInput
           placeholder="Phone"
           style={styles.input}
           value={companyInfo.phone}
           onChangeText={phone => setCompanyInfo({ ...companyInfo, phone })}
         />
-        <TextInput
+        <Text style={styles.label}>Email</Text>
+        <CustomTextInput
           placeholder="Email"
           style={styles.input}
           value={companyInfo.email}
           onChangeText={email => setCompanyInfo({ ...companyInfo, email })}
         />
-        <TextInput
+        <Text style={styles.label}>Address</Text>
+        <CustomTextInput
           placeholder="Address"
           style={styles.input}
           value={companyInfo.address}
@@ -145,6 +150,12 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#6b7280',
+  },
+  label: {
+  fontSize: 14,
+  fontWeight: '500',
+  color: '#374151',
+  marginBottom: 4,
   },
   content: {
     flex: 1,
