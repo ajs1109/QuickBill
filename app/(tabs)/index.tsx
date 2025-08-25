@@ -1,5 +1,6 @@
+import EditPaymentModal from '@/components/EditPaymentModal';
 import { useFocusEffect } from 'expo-router';
-import { FileText, Search, Share, Trash2 } from 'lucide-react-native';
+import { Edit3, FileText, Search, Share, Trash2 } from 'lucide-react-native';
 import React, { useCallback, useState } from 'react';
 import {
   Alert,
@@ -20,6 +21,8 @@ export default function InvoicesScreen() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -91,6 +94,32 @@ export default function InvoicesScreen() {
     }
   };
 
+  const handleEditPayment = (invoice: Invoice) => {
+  setSelectedInvoice(invoice);
+  setEditModalVisible(true);
+};
+
+const handleSavePayment = async (invoiceId: string, newPaidAmount: string) => {
+  try {
+    const paidAmount = Number(newPaidAmount) || 0;
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+    
+    const newStatus = paidAmount >= invoice.total ? 'paid' : (paidAmount > 0 ? 'partial' : 'pending');
+
+    const updatedInvoice: Invoice = {
+      ...invoice,
+      paidAmount: newPaidAmount,
+      status: newStatus,
+    };
+    
+    await invoiceStorage.updateInvoice(updatedInvoice);
+    await loadInvoices();
+  } catch (error) {
+    Alert.alert('Error', 'Failed to update payment');
+  }
+};
+
   const renderInvoiceItem = ({ item }: { item: Invoice }) => (
     <View style={styles.invoiceCard}>
       <View style={styles.invoiceHeader}>
@@ -122,6 +151,14 @@ export default function InvoicesScreen() {
         >
           <Share size={16} color="#3b82f6" />
           <Text style={styles.actionText}>Share PDF</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => handleEditPayment(item)}
+        >
+          <Edit3 size={16} color="#10b981" />
+          <Text style={[styles.actionText, { color: '#10b981' }]}>Edit Payment</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -172,6 +209,15 @@ export default function InvoicesScreen() {
             </Text>
           </View>
         }
+      />
+      <EditPaymentModal
+        visible={editModalVisible}
+        invoice={selectedInvoice}
+        onClose={() => {
+          setEditModalVisible(false);
+          setSelectedInvoice(null);
+        }}
+        onSave={handleSavePayment}
       />
     </SafeAreaView>
   );
